@@ -1,7 +1,8 @@
 var bee = require("beeline");
 var play = require('play').Play();
 var applescript = require("applescript");
-var ev = require("events").EventEmitter;
+var Emitter = require('events').EventEmitter;
+var ev = new Emitter();
 var itunes = {
     pause_script: 'tell application "iTunes" to pause',
     play_script: 'tell application "iTunes" to play',
@@ -13,11 +14,15 @@ var itunes = {
             if (rtn === "true"){
                 itunes.pause(function(){
                     play.sound(sfx, function(){
+                        ev.emit('lold', sfx);
                         itunes.play();
                     });
                 });
             } else {
-                play.sound(sfx);
+                play.sound(sfx, function(){
+                    ev.emit('lold', sfx);
+                    
+                });
             }
         });
     },
@@ -45,8 +50,20 @@ var lol = {
     play: function(path){ 
         itunes.isPlaying(path);
     },
-    
-}; 
+    goToSleep: function(){
+        console.log("lold event emitted");
+        lol.awake = false;
+        console.log("lol.awake === " + lol.awake);
+        ev.emit('lolToSleep');
+    },
+    setTimer: function(){
+        console.log("loltoSleep event emitted");
+        setTimeout(function(){
+            lol.awake = true;
+            console.log("lol.awake === " + lol.awake);
+        }, 1 * 60 * 1000);
+    }
+};
 
 var lolz = {
     "thingsucks" : './sfx/fts.mp3',
@@ -60,13 +77,12 @@ var router = bee.route({ // Create a new router
         // Matches is an array / matches[0] will be the sound we want to play
         // if matches[0] is a key in the lolz object, we'll pass that to lol.play
         // otherwise, we 404
-        var sound = matches[0];
-        if (lolz[sound] !== undefined){
+        if (lolz[matches[0]] !== undefined){
             console.log(matches);
             res.writeHead(200, {'Content-Type': 'text/plain'});
             if (lol.awake){
-                lol.play(lolz[sound]);
-                res.end(sound);
+                lol.play(lolz[matches[0]]);
+                res.end(matches[0]);
             } else {
                 res.end('sleeping');
             }
@@ -92,3 +108,5 @@ var router = bee.route({ // Create a new router
     }
 });
 require("http").createServer(router).listen(8001); // Starts serve with routes defined above
+ev.on('lold', lol.goToSleep);
+ev.on('lolToSleep', lol.setTimer);
