@@ -8,8 +8,6 @@ var itunes = {
     play_script: 'tell application "iTunes" to play',
     isPlaying: function(sfx){
         applescript.execFile('./applescripts/getItunesStatus.applescript', function(err, rtn) {
-            console.log(rtn);
-            console.log("rtn is " + typeof rtn);
             if (rtn === "true"){
                 itunes.pause(function(){
                     play.sound(sfx, function(){
@@ -35,7 +33,6 @@ var itunes = {
         });
     },
     play: function(callback){
-        console.log('itunes.play running');
         applescript.execString(itunes.play_script, function(err, rtn) {
             console.log('itunes is playing');
             if (typeof callback === "function"){
@@ -50,16 +47,13 @@ var lol = {
         itunes.isPlaying(path);
     },
     goToSleep: function(){
-        console.log("lold event emitted");
         lol.awake = false;
-        console.log("lol.awake === " + lol.awake);
         ev.emit('lolToSleep');
     },
     setTimer: function(){
         console.log("loltoSleep event emitted");
         setTimeout(function(){
             lol.awake = true;
-            console.log("lol.awake === " + lol.awake);
         }, 15 * 60 * 1000);
     }
 };
