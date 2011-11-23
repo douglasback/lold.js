@@ -6,7 +6,6 @@ var ev = new Emitter();
 var itunes = {
     pause_script: 'tell application "iTunes" to pause',
     play_script: 'tell application "iTunes" to play',
-    is_playing_script: 'tell application "iTunes" if player state is paused then return true else return false',
     isPlaying: function(sfx){
         applescript.execFile('./applescripts/getItunesStatus.applescript', function(err, rtn) {
             console.log(rtn);
@@ -61,7 +60,7 @@ var lol = {
         setTimeout(function(){
             lol.awake = true;
             console.log("lol.awake === " + lol.awake);
-        }, 1 * 60 * 1000);
+        }, 15 * 60 * 1000);
     }
 };
 
