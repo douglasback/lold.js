@@ -1,19 +1,23 @@
 var bee = require("beeline");
 var play = require('play').Play();
 var applescript = require("applescript");
+var lolz = require("./lolz");
 var Emitter = require('events').EventEmitter;
 var ev = new Emitter();
 var itunes = {
     pause_script: 'tell application "iTunes" to pause',
     play_script: 'tell application "iTunes" to play',
-    isPlaying: function(sfx){
+    isPlaying: function(){
+        var callback = arguments.slice(0,0);
+            sfx = arguments.slice(1);
         applescript.execFile('./applescripts/getItunesStatus.applescript', function(err, rtn) {
             if (rtn === "true"){
                 itunes.pause(function(){
-                    play.sound(sfx, function(){
-                        ev.emit('lold', sfx);
-                        itunes.play();
-                    });
+                    callback.apply(this, [sfx, function(){
+                                    ev.emit('lold', sfx);
+                                    itunes.play();
+
+                    }]);
                 });
             } else {
                 play.sound(sfx, function(){
@@ -44,13 +48,20 @@ var itunes = {
 var lol = {
     awake: true,
     play: function(path){ 
-        itunes.isPlaying(path);
+        itunes.isPlaying().apply(this, [play.sound, path]); 
+            
+        //     play.sound(sfx,function(){
+        //     
+        // })
+        );
     },
     goToSleep: function(){
         lol.awake = false;
         ev.emit('lolToSleep');
     },
     setTimer: function(){
+        // After a clip is played, we go to sleep for 15 minutes
+        // ...kind of. Have to use setTimeout to change state.
         console.log("loltoSleep event emitted");
         setTimeout(function(){
             lol.awake = true;
@@ -58,11 +69,6 @@ var lol = {
     }
 };
 
-var lolz = {
-    "thingsucks" : './sfx/fts.mp3',
-    "forensic" : './sfx/forensic.mp3',
-    "facebook" : './sfx/facebook.mp3'
-};
 
 var router = bee.route({ // Create a new router
 
@@ -70,11 +76,11 @@ var router = bee.route({ // Create a new router
         // Matches is an array / matches[0] will be the sound we want to play
         // if matches[0] is a key in the lolz object, we'll pass that to lol.play
         // otherwise, we 404
-        if (lolz[matches[0]] !== undefined){
+        if (lolz.clips[matches[0]] !== undefined){
             console.log(matches);
             res.writeHead(200, {'Content-Type': 'text/plain'});
             if (lol.awake){
-                lol.play(lolz[matches[0]]);
+                lol.play(lolz.clips[matches[0]]);
                 res.end(matches[0]);
             } else {
                 res.end('sleeping');
