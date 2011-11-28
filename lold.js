@@ -20,10 +20,9 @@ var itunes = {
                     }]);
                 });
             } else {
-                play.sound(sfx, function(){
-                    ev.emit('lold', sfx);
-                    
-                });
+                callback.apply(this, [sfx, function(){
+                                ev.emit('lold', sfx);
+                }]);
             }
         });
     },
@@ -48,12 +47,12 @@ var itunes = {
 var lol = {
     awake: true,
     play: function(path){ 
-        itunes.isPlaying().apply(this, [play.sound, path]); 
+        itunes.isPlaying.apply(this, [play.sound, path]); 
             
         //     play.sound(sfx,function(){
         //     
         // })
-        );
+        //);
     },
     goToSleep: function(){
         lol.awake = false;
