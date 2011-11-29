@@ -5,7 +5,8 @@ var clips = {
     "chongchong" : './sfx/chongchong.mp3',
     "trombone" : './sfx/trombone.mp3',
     "gui" : './sfx/gui.mp3',
-    "1up" : './sfx/1up.mp3'
+    "1up" : './sfx/1up.mp3',
+    "doitlive" : './sfx/doitlive.mp3'
 };
 
 exports.clips = clips;
