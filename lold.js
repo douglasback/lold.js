@@ -67,7 +67,8 @@ var lol = {
 var lolz = {
     "thingsucks" : './sfx/fts.mp3',
     "forensic" : './sfx/forensic.mp3',
-    "facebook" : './sfx/facebook.mp3'
+    "facebook" : './sfx/facebook.mp3',
+    "chongchong" : './sfx/chongchong.mp3'
 };
 
 var router = bee.route({ // Create a new router
