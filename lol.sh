@@ -1,6 +1,6 @@
 #! /bin/bash
 
-SERVER='http://localhost'
+SERVER='http://itunes.local'
 PORT='8001'
 if [ ! -n "$1" ]
 then

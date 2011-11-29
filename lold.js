@@ -1,7 +1,7 @@
 var bee = require("beeline");
 var play = require('play').Play();
 var applescript = require("applescript");
-var lolz = require("./lolz");
+var lolz = require("./lolz").clips;
 var Emitter = require('events').EventEmitter;
 var ev = new Emitter();
 var itunes = {
