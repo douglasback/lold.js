@@ -10,7 +10,9 @@ var clips = {
     "boomroasted" : "./sfx/boomroasted.mp3",
     "losinghorns" : "./sfx/losinghorns.mp3",
     "oops" : "./sfx/oops.mp3",
-    "pacman" : "./sfx/pacman.mp3"
+    "pacman" : "./sfx/pacman.mp3",
+    "allnerds" : "./sfx/allnerds.mp3",
+    "nerds" : "./sfx/allnerds.mp3"
 };
 
 exports.clips = clips;
