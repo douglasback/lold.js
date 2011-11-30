@@ -9,8 +9,6 @@ var itunes = {
     play_script: 'tell application "iTunes" to play',
     isPlaying: function(sfx){
         applescript.execFile('./applescripts/getItunesStatus.applescript', function(err, rtn) {
-            console.log(rtn);
-            console.log("rtn is " + typeof rtn);
             if (rtn === "true"){
                 itunes.pause(function(){
                     play.sound(sfx, function(){
@@ -27,9 +25,7 @@ var itunes = {
         });
     },
     pause: function(callback){
-        
         applescript.execString(itunes.pause_script, function(err, rtn) {
-            itunes.wasPlaying = true;
             if (typeof callback === "function"){
                 callback.call(this,err,rtn);
             }
