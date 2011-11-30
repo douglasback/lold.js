@@ -8,5 +8,9 @@ then
     echo "Usage: lol (sfx)"
     exit
 fi
-
-curl -s -o "/dev/null" $SERVER":"$PORT"/"$1
+if [ "$1" = "list" ]
+then
+    curl -s $SERVER":"$PORT"/"$1
+else
+    curl -s -o "/dev/null" $SERVER":"$PORT"/"$1
+fi
