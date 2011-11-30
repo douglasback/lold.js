@@ -66,11 +66,13 @@ var lol = {
 };
 
 var router = bee.route({ // Create a new router
-    "list" : function(req,res){
+    "/list" : function(req,res){
         res.writeHead(200, {'Content-Type': 'text/plain'});
-        for (i=0; i < lolz.length; i++){
-            res.write
+        res.write("Here is a list of available sounds:\n");
+        for (i in lolz){
+            res.write(i + "\n");
         }
+        res.end();
     },
     "r`^/([\\w]+)$`": function(req, res, matches) {
         // Matches is an array / matches[0] will be the sound we want to play
