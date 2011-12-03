@@ -7,8 +7,21 @@ var ev = new Emitter();
 var itunes = {
     pause_script: 'tell application "iTunes" to pause',
     play_script: 'tell application "iTunes" to play',
+    isOpen: function(sfx){
+        ev.emit("check-itunes-open-start");
+        applescript.execFile('./applescripts/isItunesOpen.applescript', function(err, rtn) {
+            ev.emit("check-itunes-open-end");
+            if (rtn === "true"){
+                itunes.isPlaying(sfx);
+            } else {
+                play.sound(sfx);
+            }
+        });
+    },
     isPlaying: function(sfx){
+        ev.emit("check-itunes-playing-start");
         applescript.execFile('./applescripts/getItunesStatus.applescript', function(err, rtn) {
+            ev.emit("check-itunes-playing-end");
             if (rtn === "true"){
                 itunes.pause(function(){
                     play.sound(sfx, function(){
@@ -25,16 +38,18 @@ var itunes = {
         });
     },
     pause: function(callback){
+        ev.emit("itunes-pause-start");
         applescript.execString(itunes.pause_script, function(err, rtn) {
+            ev.emit("itunes-pause-end");
             if (typeof callback === "function"){
                 callback.call(this,err,rtn);
             }
         });
     },
     play: function(callback){
-        console.log('itunes.play running');
+        ev.emit("itunes-play-start");
         applescript.execString(itunes.play_script, function(err, rtn) {
-            console.log('itunes is playing');
+            ev.emit("itunes-play-end");
             if (typeof callback === "function"){
                 callback.call(this,err,rtn);
             }
@@ -44,7 +59,7 @@ var itunes = {
 var lol = {
     awake: true,
     play: function(path){ 
-        itunes.isPlaying(path);
+        itunes.isOpen(path);
     },
     goToSleep: function(){
         console.log("lold event emitted");
@@ -57,7 +72,7 @@ var lol = {
         setTimeout(function(){
             lol.awake = true;
             console.log("lol.awake === " + lol.awake);
-        }, 15 * 60 * 1000);
+        }, 1000);
     }
 };
 
@@ -90,7 +105,6 @@ var router = bee.route({ // Create a new router
         }
         
         
-        
     },
     "`404`": function(req, res) {
         // Called when no other route rule are matched
@@ -107,3 +121,27 @@ var router = bee.route({ // Create a new router
 require("http").createServer(router).listen(8001); // Starts serve with routes defined above
 ev.on('lold', lol.goToSleep);
 ev.on('lolToSleep', lol.setTimer);
+ev.on("check-itunes-open-start", function(){
+    console.time("check-itunes-open")
+});
+ev.on("check-itunes-open-end", function(){
+     console.timeEnd("check-itunes-open")
+});
+ev.on("check-itunes-playing-start", function(){
+     console.time("check-itunes-playing")
+});
+ev.on("check-itunes-playing-end", function(){
+     console.timeEnd("check-itunes-playing")
+});
+ev.on("itunes-pause-start", function(){
+     console.time("itunes-pausing")
+});
+ev.on("itunes-pause-end", function(){
+     console.timeEnd("itunes-pausing")
+});
+ev.on("itunes-play-start", function(){
+     console.time("itunes-resuming")
+});
+ev.on("itunes-play-end", function(){
+     console.timeEnd("itunes-resuming")
+});
