@@ -1,12 +1,28 @@
-var bee = require("beeline");
-var play = require('play').Play();
-var applescript = require("applescript");
-var lolz = require("./lolz").clips;
-var Emitter = require('events').EventEmitter;
-var ev = new Emitter();
+var bee = require("beeline"),
+    play = require('play').Play(),
+    applescript = require("applescript"),
+    lolz = require("./lolz").clips,
+    Emitter = require('events').EventEmitter,
+    ev = new Emitter(),
+    debugMode = false,
+    sleepForMinutes = debugMode ? 0.1 : 15,
+    pollingInterval = 2;
+    
 var itunes = {
     pause_script: 'tell application "iTunes" to pause',
     play_script: 'tell application "iTunes" to play',
+    primeIt: function(callback){
+        applescript.execFile('./applescripts/isItunesOpen.applescript', function(err, rtn) {
+            if (rtn === "true"){
+                if (debugMode) console.log("iTunes is open, pump is primed");
+            } else {
+                if (debugMode) console.log("iTunes is closed, pump is primed");
+            }
+        });
+        if (typeof callback == "function"){
+            callback.call();
+        }
+    },
     isOpen: function(sfx){
         ev.emit("check-itunes-open-start");
         applescript.execFile('./applescripts/isItunesOpen.applescript', function(err, rtn) {
@@ -62,17 +78,20 @@ var lol = {
         itunes.isOpen(path);
     },
     goToSleep: function(){
-        console.log("lold event emitted");
+        if (debugMode) console.log("lold event emitted");
         lol.awake = false;
-        console.log("lol.awake === " + lol.awake);
+        if (debugMode) console.log("lol.awake === " + lol.awake);
         ev.emit('lolToSleep');
     },
     setTimer: function(){
-        console.log("loltoSleep event emitted");
+        if (debugMode) console.log("loltoSleep event emitted");
         setTimeout(function(){
             lol.awake = true;
-            console.log("lol.awake === " + lol.awake);
-        }, 1000);
+            if (debugMode) console.log("lol.awake === " + lol.awake);
+        }, (sleepForMinutes * 60 * 1000));
+    },
+    getStatusAsString: function(){
+        return lol.awake ? "awake" : "sleeping";
     }
 };
 
@@ -84,6 +103,19 @@ var router = bee.route({ // Create a new router
             res.write(i + "\n");
         }
         res.end();
+    },
+    "/status" : function(req,res){
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.write("lold.js is " + lol.getStatusAsString() + "\n");
+        res.end();
+    },
+    "/prime" : function(req,res){
+        console.log("priming");
+        itunes.primeIt(function(){
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.write("The pump is primed.");
+            res.end();
+        });
     },
     "r`^/([\\w]+)$`": function(req, res, matches) {
         // Matches is an array / matches[0] will be the sound we want to play
@@ -121,27 +153,33 @@ var router = bee.route({ // Create a new router
 require("http").createServer(router).listen(8001); // Starts serve with routes defined above
 ev.on('lold', lol.goToSleep);
 ev.on('lolToSleep', lol.setTimer);
-ev.on("check-itunes-open-start", function(){
-    console.time("check-itunes-open")
-});
-ev.on("check-itunes-open-end", function(){
-     console.timeEnd("check-itunes-open")
-});
-ev.on("check-itunes-playing-start", function(){
-     console.time("check-itunes-playing")
-});
-ev.on("check-itunes-playing-end", function(){
-     console.timeEnd("check-itunes-playing")
-});
-ev.on("itunes-pause-start", function(){
-     console.time("itunes-pausing")
-});
-ev.on("itunes-pause-end", function(){
-     console.timeEnd("itunes-pausing")
-});
-ev.on("itunes-play-start", function(){
-     console.time("itunes-resuming")
-});
-ev.on("itunes-play-end", function(){
-     console.timeEnd("itunes-resuming")
-});
+setInterval(function(){
+    if (lol.awake) itunes.primeIt(); }
+    , (pollingInterval * 60 * 1000));
+    
+if (!!debugMode){
+    ev.on("check-itunes-open-start", function(){
+        console.time("check-itunes-open")
+    });
+    ev.on("check-itunes-open-end", function(){
+         console.timeEnd("check-itunes-open")
+    });
+    ev.on("check-itunes-playing-start", function(){
+         console.time("check-itunes-playing")
+    });
+    ev.on("check-itunes-playing-end", function(){
+         console.timeEnd("check-itunes-playing")
+    });
+    ev.on("itunes-pause-start", function(){
+         console.time("itunes-pausing")
+    });
+    ev.on("itunes-pause-end", function(){
+         console.timeEnd("itunes-pausing")
+    });
+    ev.on("itunes-play-start", function(){
+         console.time("itunes-resuming")
+    });
+    ev.on("itunes-play-end", function(){
+         console.timeEnd("itunes-resuming")
+    });
+}
