@@ -12,9 +12,12 @@ var clips = {
     "oops" : "./sfx/oops.mp3",
     "pacman" : "./sfx/pacman.mp3",
     "allnerds" : "./sfx/allnerds.mp3",
-    "nerds" : "./sfx/allnerds.mp3",
     "marioclear" : "./sfx/marioclear.mp3",
-    "mariopipe" : "./sfx/mariopipe.mp3"
+    "mariopipe" : "./sfx/mariopipe.mp3",
+    "bueller" : "./sfx/bueller.mp3",
+    "ohyeah" : "./sfx/ohyeah.mp3",
+    "tmyk" : "./sfx/tmyk.mp3",
+    "yeah" : "./sfx/yeah.mp3"
 };
 
 exports.clips = clips;
