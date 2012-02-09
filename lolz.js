@@ -17,7 +17,8 @@ var clips = {
     "bueller" : "./sfx/bueller.mp3",
     "ohyeah" : "./sfx/ohyeah.mp3",
     "tmyk" : "./sfx/tmyk.mp3",
-    "yeah" : "./sfx/yeah.mp3"
+    "yeah" : "./sfx/yeah.mp3",
+    "secret" : "./sfx/secret.mp3"
 };
 
 exports.clips = clips;
