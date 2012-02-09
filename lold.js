@@ -31,6 +31,7 @@ var itunes = {
                 itunes.isPlaying(sfx);
             } else {
                 play.sound(sfx);
+                ev.emit('lold', sfx);
             }
         });
     },
