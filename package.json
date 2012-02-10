@@ -1,0 +1,11 @@
+{
+  "name": "lold",
+  "description": "Play hilarious sound effects",
+  
+  "dependencies": {
+    "colors": "0.5.x",
+    "express": "2.5.x",
+    "play": "0.5.x"
+  },
+  "engine": "node >= 0.5.0"
+}

@@ -1,4 +1,5 @@
-var bee = require("beeline"),
+var express = require("express"),
+    app = module.exports = express.createServer(),
     play = require('play').Play(),
     applescript = require("applescript"),
     lolz = require("./lolz").clips,
@@ -96,62 +97,45 @@ var lol = {
     }
 };
 
-var router = bee.route({ // Create a new router
-    "/list" : function(req,res){
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.write("Here is a list of available sounds:\n");
-        for (i in lolz){
-            res.write(i + "\n");
-        }
-        res.end();
-    },
-    "/status" : function(req,res){
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.write("lold.js is " + lol.getStatusAsString() + "\n");
-        res.end();
-    },
-    "/prime" : function(req,res){
-        console.log("priming");
-        itunes.primeIt(function(){
-            res.writeHead(200, {'Content-Type': 'text/plain'});
-            res.write("The pump is primed.");
-            res.end();
-        });
-    },
-    "r`^/([\\w]+)$`": function(req, res, matches) {
-        // Matches is an array / matches[0] will be the sound we want to play
-        // if matches[0] is a key in the lolz object, we'll pass that to lol.play
-        // otherwise, we 404
-        if (lolz[matches[0]] !== undefined){
-            console.log(matches);
-            res.writeHead(200, {'Content-Type': 'text/plain'});
-            if (lol.awake){
-                lol.play(lolz[matches[0]]);
-                res.end(matches[0]);
-            } else {
-                res.end('sleeping');
-            }
-        } else {
-            res.writeHead(404, {'Content-Type': 'text/plain'});
-            res.end("Nope.");
-            
-        }
-        
-        
-    },
-    "`404`": function(req, res) {
-        // Called when no other route rule are matched
-        res.writeHead(404, {'Content-Type': 'text/plain'});
-        res.end("Nope.");
-        
-    },
-    "`503`": function(req, res, err) {
-        // Called when an exception is thrown by another router function
-        // The error that caused the exception is passed as the third parameter
-        // This _not_ guarranteed to catch all exceptions
+app.get('/list', function(req, res){
+    res.contentType('text/plain');
+    res.send("Here is a list of available sounds:\n");
+    for (i in lolz){
+        res.send(i + "\n");
     }
 });
-require("http").createServer(router).listen(8001); // Starts serve with routes defined above
+app.get("/status", function(req, res){
+    res.contentType('text/plain');
+
+    res.send("lold.js is " + lol.getStatusAsString() + "\n");
+});
+app.get("/prime", function(req,res){
+    console.log("priming");
+    itunes.primeIt(function(){
+        res.contentType("text/plain");
+        res.send("The pump is primed.");
+    });
+});
+app.get("/:sound", function(req,res){
+    res.contentType('text/plain');
+    
+    if (lolz[req.param("sound")] !== undefined){
+        console.log(req.param("sound") + " (" + lol.getStatusAsString() + ")");
+        if (lol.awake){
+            lol.play(lolz[req.param("sound")]);
+            res.send(lolz[req.param("sound")]);
+        } else {
+            res.send('sleeping');
+        }
+    } else {
+        res.contentType('text/plain');
+
+        res.send("Nope.");
+        
+    }
+});
+
+app.listen(8001); // Starts serve with routes defined above
 ev.on('lold', lol.goToSleep);
 ev.on('lolToSleep', lol.setTimer);
 setInterval(function(){
