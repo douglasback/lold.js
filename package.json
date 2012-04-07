@@ -1,11 +1,11 @@
 {
   "name": "lold",
   "description": "Play hilarious sound effects",
-  
+  "version" : "0.2.0",
   "dependencies": {
-    "colors": "0.5.x",
+    "applescript" : "0.2.1",
     "express": "2.5.x",
-    "play": "0.5.x"
+    "play": "git://github.com/Marak/play.js.git#d3ca7a04d1bd58c3ad72df3088f92985742e41cc"
   },
   "engine": "node >= 0.5.0"
 }
